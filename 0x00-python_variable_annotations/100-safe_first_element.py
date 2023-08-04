@@ -1,4 +1,4 @@
-#!/usr/bin env python3
+#!/usr/bin/env python3
 """Defines type-annotated function"""
 
 from typing import Sequence, Any, Union
