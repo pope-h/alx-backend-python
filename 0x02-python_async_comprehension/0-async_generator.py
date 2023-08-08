@@ -2,11 +2,11 @@
 """Defines async_generator"""
 
 import asyncio
-import random
+from random import random
 
 
 async def async_generator():
     """Yields a random int 10 times"""
     for i in range(10):
         await asyncio.sleep(1)
-        yield random.uniform(0, 10)
+        yield random() * 10
