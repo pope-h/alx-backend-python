@@ -5,7 +5,7 @@ Parameterize a unit test
 import unittest
 from parameterized import parameterized
 from unittest.mock import patch, Mock
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -45,16 +45,44 @@ class TestGetJson(unittest.TestCase):
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False})
     ])
-    @patch("utils.requests.get")
-    def test_get_json(self, url, payload, mock_get):
+    def test_get_json(self, url, payload):
         """
         method to test that the method returns what it is supposed to.
         """
-        mock_response = Mock()
-        mock_response.json.return_value = payload
-        mock_get.return_value = mock_response
+        class Mocked(Mock):
+            """
+            class that inherits from Mock
+            """
 
-        result = get_json(url)
+            def json(self):
+                """
+                json returning a payload
+                """
+                return payload
 
-        mock_get.assert_called_once_with(url)
-        self.assertEqual(result, payload)
+        with patch("requests.get") as MockClass:
+            MockClass.return_value = Mocked()
+            self.assertEqual(get_json(url), payload)
+
+
+class TestMemoize(unittest.TestCase):
+    ''' memoize unittest '''
+
+    def test_memoize(self):
+        ''' memoize test '''
+
+        class TestClass:
+            ''' self descriptive'''
+
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+
+        with patch.object(TestClass, 'a_method') as mocked:
+            spec = TestClass()
+            spec.a_property
+            spec.a_property
+            mocked.asset_called_once()
